@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Keyword Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .result {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .result h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .result p {
+            margin: 10px 0;
+        }
+        
+        .result .highlight {
+            background-color: #ffff00;
+        }
+        
+        .result .fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+        }
+        
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .pagination a {
+            display: inline-block;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #333;
+            border: 1px solid #ddd;
+            margin: 0 4px;
+            border-radius: 4px;
+        }
+        
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: #fff;
+            border-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center;">
+        <form method="POST">
+            <input type="text" name="search_query" value="{{ search_query }}" placeholder="Enter search query">
+            <select name="filter_type">
+                <option value="">All</option>
+                <option value="code" {% if filter_type == 'code' %}selected{% endif %}>Code</option>
+                <option value="regulation" {% if filter_type == 'regulation' %}selected{% endif %}>Regulation</option>
+            </select>
+            <input type="submit" value="Search">
+        </form>
+    </div>
+    <hr>
+    {% for result in results %}
+        <div>
+            {% if result.TYPE == 'regulation' %}
+                <h3>{{ result.Department }} > {{ result.chapter }} > {{ result.subject }} > {{ result.rule_heading }}</h3>
+            {% else %}
+                <h3>{{ result.year }} > {{ result.title }} > {{ result.chapter }} > {{ result.article }} > {{ result.section_heading }}</h3>
+            {% endif %}
+            <p>{{ result.highlighted_text|safe }}</p>
+        </div>
+        <hr>
+    {% endfor %}
+    {% if total_results > per_page %}
+        <div style="text-align: center;">
+            {% if page > 1 %}
+            <a href="?page={{ page - 1 }}&search_query={{ search_query }}&filter_type={{ filter_type }}">Previous</a>
+            {% endif %}
+            Page {{ page }} of {{ (total_results // per_page) + 1 }}
+            {% if page < (total_results // per_page) + 1 %}
+                <a href="?page={{ page + 1 }}&search_query={{ search_query }}&filter_type={{ filter_type }}">Next</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</body>
+</html>
